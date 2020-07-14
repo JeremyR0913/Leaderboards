@@ -25,6 +25,9 @@ public class Leaderboard {
         this.stat = stat;
     }
 
+    /*
+    Constructor used when creating new leaderboards. Registers defaults.
+     */
     public Leaderboard(Main plugin, String identifier, Location location, Stat stat) {
         this.plugin = plugin;
         file = new File(plugin.getDataFolder() + File.separator + "leaderboards", identifier + ".yml");
@@ -53,6 +56,20 @@ public class Leaderboard {
     private Map<Integer, ArmorStand> armorStandMap = new HashMap<>();
     private String format = "&e{name} &f{value}";
 
+    /*
+    Executed from StatManager.java.
+    Loads info from leaderboard file.
+    Variables:
+        title = title of armorstand
+        size = how many players to show in leaderboard
+        recentSeconds = how recent of values you want to look at, I.E. if you want a leaderboard
+            that looks at the last 24 hours this would be 86400
+        refreshSeconds = how often the database is queried and the armorstands update.
+        location = location of leaderboard
+        task = task for updating armorstands.
+        space = distance (height) between armor stands.
+        armorStandMap = Map (runtime storage) referencing armorstands.
+     */
     public void initialize() {
         identifier = file.getName().substring(0, file.getName().length() - 4).toLowerCase();
         FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
@@ -95,6 +112,9 @@ public class Leaderboard {
         Main.log("Initialized Leaderboard: " + getIdentifier());
     }
 
+    /*
+    Kills armorstands and cancels task when plugin disables (server stop/reload)
+     */
     public void terminate() {
         task.cancel();
         for (ArmorStand as : armorStandMap.values()){
@@ -103,6 +123,9 @@ public class Leaderboard {
         armorStandMap.clear();
     }
 
+    /*
+    Saves leaderboard info to file. Run when leaderboard options are changed.
+     */
     public void saveFile() {
         FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
         fileConfig.set("stat", stat.getIdentifier());

@@ -18,6 +18,11 @@ public class JoinQuitEvents implements Listener {
         this.plugin = plugin;
     }
 
+    /*
+    Default methods for getting UUID <-> name or name <-> UUID for offline players
+    is very resource intensive. This stores UUIDs/names of any player that has joined the
+    server in a database for easy access later.
+     */
     @EventHandler
     public void joinEvent(PlayerJoinEvent e){
         Player player = e.getPlayer();
