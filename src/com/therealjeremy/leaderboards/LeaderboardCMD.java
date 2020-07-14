@@ -160,7 +160,7 @@ public class LeaderboardCMD implements CommandExecutor {
                 }
             }
             if (!b){
-                sender.sendMessage(Main.color("&cNot leaderboards could be found in that radius."));
+                sender.sendMessage(Main.color("&cNo leaderboards could be found in that radius."));
             }
             sender.sendMessage(Main.color("&7=============================="));
             return true;
