@@ -38,7 +38,7 @@ public class StatTimePlayed extends Stat {
                     float pitch = afkInfo.pitch;
                     float yaw = afkInfo.yaw;
                     if (pitch != player.getLocation().getPitch() || yaw != player.getLocation().getYaw()){
-                        increaseValue(player, (int) (System.currentTimeMillis() - timeJoined));
+                        increaseValue(player, (int) (System.currentTimeMillis() - timeJoined), player.getWorld().getName());
                     }
                     afkInfo.pitch = player.getLocation().getPitch();
                     afkInfo.yaw = player.getLocation().getYaw();
@@ -67,7 +67,7 @@ public class StatTimePlayed extends Stat {
             float pitch = afkInfo.pitch;
             float yaw = afkInfo.yaw;
             if (pitch != player.getLocation().getPitch() || yaw != player.getLocation().getYaw()){
-                increaseValue(player, (int) (System.currentTimeMillis() - timeJoined));
+                increaseValue(player, (int) (System.currentTimeMillis() - timeJoined), player.getWorld().getName());
             }
         }
         playerMap.clear();
@@ -91,16 +91,16 @@ public class StatTimePlayed extends Stat {
         float pitch = afkInfo.pitch;
         float yaw = afkInfo.yaw;
         if (pitch != player.getLocation().getPitch() || yaw != player.getLocation().getYaw()){
-            increaseValue(player, (int) (System.currentTimeMillis() - timeJoined));
+            increaseValue(player, (int) (System.currentTimeMillis() - timeJoined), player.getWorld().getName());
         }
         playerMap.remove(player);
         afkMap.remove(player);
     }
 
     @Override
-    public String format(int value) {
+    public String format(double value) {
         String format;
-        int seconds = value / 1000;
+        int seconds = (int) value / 1000;
         if (seconds > 86400) {
             format = Main.decimalFormat.format((double) seconds / 86400.0) + " days";
         } else if (seconds > 3600) {

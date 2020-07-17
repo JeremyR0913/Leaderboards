@@ -1,8 +1,6 @@
 package com.therealjeremy.leaderboards;
 
-import com.therealjeremy.leaderboards.stats.StatBlocksMined;
-import com.therealjeremy.leaderboards.stats.StatMobsKilled;
-import com.therealjeremy.leaderboards.stats.StatTimePlayed;
+import com.therealjeremy.leaderboards.stats.*;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -58,6 +56,11 @@ public class StatManager {
         initializeStat(new StatMobsKilled(plugin));
         initializeStat(new StatBlocksMined(plugin));
         initializeStat(new StatTimePlayed(plugin));
+        initializeStat(new StatExpGained(plugin));
+        initializeStat(new StatAdvancementsFinished(plugin));
+        initializeStat(new StatTriggerRaid(plugin));
+        initializeStat(new StatRaidWaves(plugin));
+        initializeStat(new StatDamageDealt(plugin));
     }
 
     private void initializeStat(Stat stat){

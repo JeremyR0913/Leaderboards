@@ -20,6 +20,7 @@ public class LeaderboardCMD implements CommandExecutor {
         permissionMap.put("delete", "jcore.admin.leaderboard.delete");
         permissionMap.put("teleport", "jcore.admin.leaderboard.teleport");
         permissionMap.put("title", "jcore.admin.leaderboard.title");
+        permissionMap.put("category", "jcore.admin.leaderboard.category");
         permissionMap.put("size", "jcore.admin.leaderboard.size");
         permissionMap.put("near", "jcore.admin.leaderboard.near");
     }
@@ -33,6 +34,7 @@ public class LeaderboardCMD implements CommandExecutor {
             helpMap.put("delete", "&aThis command is a work in progress.");
             helpMap.put("teleport", "&cUsage: /leaderboard teleport [id]");
             helpMap.put("title", "&cUsage: /leaderboard title [id] [title]");
+            helpMap.put("category", "&cUsage: /leaderboard category [id] [category]");
             helpMap.put("size", "&cUsage: /leaderboard size [id] [size]");
             helpMap.put("near", "&cUsage: /leaderboard near (distance)");
             for (String command : helpMap.keySet()){
@@ -118,6 +120,21 @@ public class LeaderboardCMD implements CommandExecutor {
             title = title.substring(0, title.length() - 1);
             leaderboard.setTitle(title);
             sender.sendMessage(Main.color(stats + "&7Leaderboard &e" + leaderboard.getIdentifier() + "&7's title has been set."));
+            return true;
+        } else if (command.equals("category")) {
+            if (args.length < 3) {
+                sender.sendMessage(Main.color(stats + "&cUsage: /leaderboard category [id] [category]"));
+                return true;
+            }
+            String leaderboardId = args[1];
+            Leaderboard leaderboard = plugin.getStatManager().getLeaderboard(leaderboardId);
+            if (leaderboard == null){
+                sender.sendMessage(Main.color(stats + "&cA leaderboard with this id doesn't exists."));
+                return true;
+            }
+            String category = args[2];
+            leaderboard.setCategory(category);
+            sender.sendMessage(Main.color(stats + "&7Leaderboard &e" + leaderboard.getIdentifier() + "&7's category has been set."));
             return true;
         } else if (command.equals("size")) {
             if (args.length < 3) {

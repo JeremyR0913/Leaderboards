@@ -15,7 +15,7 @@ public class StatBlocksMined extends Stat {
 
     @EventHandler
     public void mineBlockEvent(BlockBreakEvent e){
-        increaseValue(e.getPlayer(), 1);
+        increaseValue(e.getPlayer(), 1, e.getBlock().getType().toString());
     }
 
 }

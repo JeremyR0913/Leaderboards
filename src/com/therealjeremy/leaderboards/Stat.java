@@ -25,6 +25,7 @@ public abstract class Stat implements Listener {
     // time
     // id
     // value
+    // category
 
     private Main plugin;
 
@@ -40,12 +41,17 @@ public abstract class Stat implements Listener {
      */
     @EventHandler
     public void quitEvent(PlayerQuitEvent e) {
-        updateEntry(e.getPlayer());
+        Map<String, Integer> valueMap = pendingValuesMap.get(e.getPlayer());
+        if (valueMap != null){
+            for (String category : valueMap.keySet()){
+                updateEntry(e.getPlayer(), category);
+            }
+        }
         pendingValuesMap.remove(e.getPlayer());
     }
 
     private Connection sqlConnection;
-    private Map<Player, Integer> pendingValuesMap = new ConcurrentHashMap<>();
+    private Map<Player, Map<String, Integer>> pendingValuesMap = new ConcurrentHashMap<>();
     private BukkitTask task;
     public int updateEntryAfterValue = 50;
     public int updateEntryAfterSeconds = 60;
@@ -57,7 +63,7 @@ public abstract class Stat implements Listener {
     public void initialize(Connection sqlConnection) throws SQLException {
         this.sqlConnection = sqlConnection;
         Statement statement = sqlConnection.createStatement();
-        statement.execute("create table if not exists " + getTableName() + "(time float(24), id varchar, value int)");
+        statement.execute("create table if not exists " + getTableName() + "(time float(24), id varchar, value int, category varchar)");
         statement.close();
         task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
 
@@ -65,17 +71,24 @@ public abstract class Stat implements Listener {
 
             @Override
             public void run() {
-                Iterator<Player> iterator = pendingValuesMap.keySet().iterator();
-                while (iterator.hasNext()){
-                    Player player = iterator.next();
-                    if (pendingValuesMap.get(player) >= updateEntryAfterValue) {
-                        updateEntry(player);
+                for (Player player : pendingValuesMap.keySet()){
+                    Map<String, Integer> valueMap = pendingValuesMap.get(player);
+                    for (String category : valueMap.keySet()){
+                        if (valueMap.get(category) >= updateEntryAfterValue){
+                            updateEntry(player, category);
+                            valueMap.remove(category);
+                        }
+                    }
+                    if (valueMap.isEmpty()){
                         pendingValuesMap.remove(player);
                     }
                 }
                 if (updateEntryAfterSeconds > 0 && counter % updateEntryAfterSeconds == 0) {
                     for (Player player : pendingValuesMap.keySet()) {
-                        updateEntry(player);
+                        Map<String, Integer> valueMap = pendingValuesMap.get(player);
+                        for (String category : valueMap.keySet()){
+                            updateEntry(player, category);
+                        }
                     }
                     pendingValuesMap.clear();
                 }
@@ -92,7 +105,10 @@ public abstract class Stat implements Listener {
      */
     public void terminate() {
         for (Player player : pendingValuesMap.keySet()) {
-            updateEntry(player);
+            Map<String, Integer> valueMap = pendingValuesMap.get(player);
+            for (String category : valueMap.keySet()){
+                updateEntry(player, category);
+            }
         }
         pendingValuesMap.clear();
         task.cancel();
@@ -109,12 +125,16 @@ public abstract class Stat implements Listener {
     /*
     Executes query that returns entries for the leaderboard depending on specified time and size.
      */
-    public List<LeaderboardEntry> getLeaderboard(int size, long time) {
+    public List<LeaderboardEntry> getLeaderboard(int size, long time, String category) {
         List<LeaderboardEntry> list = new ArrayList<>();
         Statement statement = null;
         try {
+            String query = "select id, sum(value) vsum from " + getTableName() + " where time > " + time + " group by id order by vsum desc limit " + size;
+            if (category != null){
+                query = "select id, sum(value) vsum from " + getTableName() + " where time > " + time + " and category = '" + category + "' group by id order by vsum desc limit " + size;
+            }
             statement = sqlConnection.createStatement();
-            ResultSet set = statement.executeQuery("select id, sum(value) vsum from " + getTableName() + " where time > " + time + " group by id order by vsum desc limit " + size);
+            ResultSet set = statement.executeQuery(query);
             while (set.next()) {
                 list.add(new LeaderboardEntry(set.getString(1), set.getInt(2)));
             }
@@ -134,6 +154,7 @@ public abstract class Stat implements Listener {
 
     /*
     Returns the total value of the player's stat.
+    Unused.
      */
     public int getValue(Player player){
         int n = 0;
@@ -161,27 +182,35 @@ public abstract class Stat implements Listener {
     /*
     Updates the value in the Map. *Does not update database*
      */
-    public void increaseValue(Player player, int amount) {
-        if (pendingValuesMap.containsKey(player)) {
-            int n = pendingValuesMap.get(player);
-            pendingValuesMap.put(player, n + amount);
-        } else {
-            pendingValuesMap.put(player, amount);
+    public void increaseValue(Player player, int amount, String category) {
+        category = category == null ? "default" : category;
+        if (pendingValuesMap.containsKey(player)){
+            Map<String, Integer> valueMap = pendingValuesMap.get(player);
+            int n = valueMap.containsKey(category) ? valueMap.get(category) : 0;
+            valueMap.put(category, n + amount);
+        }else{
+            Map<String, Integer> valueMap = new ConcurrentHashMap<>();
+            valueMap.put(category, amount);
+            pendingValuesMap.put(player, valueMap);
         }
     }
 
     /*
     Formatting the value for reading on the in-game leaderboard.
      */
-    public String format(int value){
+    public String format(double value){
         return Main.decimalFormat.format(value);
     }
 
     /*
     Updates database with player's values.
      */
-    public void updateEntry(Player player) {
-        plugin.executeImmediately("insert into " + getTableName() + " (id, value, time) values ('" + player.getUniqueId().toString() + "', " + pendingValuesMap.get(player) + ", " + System.currentTimeMillis() + ")");
+//    public void updateEntry(Player player) {
+//        plugin.executeImmediately("insert into " + getTableName() + " (id, value, time) values ('" + player.getUniqueId().toString() + "', " + pendingValuesMap.get(player) + ", " + System.currentTimeMillis() + ")");
+//    }
+
+    private void updateEntry(Player player, String category) {
+        plugin.executeImmediately("insert into " + getTableName() + " (id, value, time, category) values ('" + player.getUniqueId().toString() + "', " + pendingValuesMap.get(player).get(category) + ", " + System.currentTimeMillis() + ", '" + category + "')");
     }
 
 }

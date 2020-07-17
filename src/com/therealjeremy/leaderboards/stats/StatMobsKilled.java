@@ -4,15 +4,14 @@ import com.therealjeremy.leaderboards.Main;
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-public class StatMobsKilled extends Stat implements Listener {
+public class StatMobsKilled extends Stat {
 
     public StatMobsKilled(Main plugin) {
         super(plugin);
-        updateEntryAfterValue = 25;
-        updateEntryAfterSeconds = 300;
+        updateEntryAfterValue = 1;
+        updateEntryAfterSeconds = 1000000;
     }
 
     @EventHandler
@@ -21,7 +20,7 @@ public class StatMobsKilled extends Stat implements Listener {
             return;
         }
         if (e.getEntity().getKiller() != null) {
-            increaseValue(e.getEntity().getKiller(), 1);
+            increaseValue(e.getEntity().getKiller(), 1, e.getEntity().getType().toString());
         }
     }
 

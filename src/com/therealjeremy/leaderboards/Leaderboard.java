@@ -47,6 +47,7 @@ public class Leaderboard {
 
     private String identifier;
     private String title;
+    private String category;
     private int size;
     private Location location;
     private int recentSeconds;
@@ -74,6 +75,7 @@ public class Leaderboard {
         identifier = file.getName().substring(0, file.getName().length() - 4).toLowerCase();
         FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
         title = fileConfig.getString("title");
+        category = fileConfig.getString("category");
         size = fileConfig.getInt("size");
         recentSeconds = fileConfig.getInt("recency-seconds");
         refreshSeconds = fileConfig.getInt("refresh-seconds");
@@ -102,7 +104,7 @@ public class Leaderboard {
                 }
                 armorStandMap.get(0).setCustomName(Main.color(title));
                 int i = 1;
-                for (LeaderboardEntry lbe : stat.getLeaderboard(size, recentSeconds < 0 ? 0 : (System.currentTimeMillis() - (recentSeconds * 1000)))) {
+                for (LeaderboardEntry lbe : stat.getLeaderboard(size, recentSeconds < 0 ? 0 : (System.currentTimeMillis() - (recentSeconds * 1000)), category)) {
                     armorStandMap.get(i).setCustomName(Main.color(format.replace("{name}", Main.playerNameFromId(UUID.fromString(lbe.getId()))).replace("{value}", "" + stat.format(lbe.getValue()))));
                     i++;
                 }
@@ -130,6 +132,7 @@ public class Leaderboard {
         FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
         fileConfig.set("stat", stat.getIdentifier());
         fileConfig.set("title", title);
+        fileConfig.set("category", category);
         fileConfig.set("size", size);
         fileConfig.set("recency-seconds", recentSeconds);
         fileConfig.set("refresh-seconds", refreshSeconds);
@@ -165,6 +168,17 @@ public class Leaderboard {
 
     public void setTitle(String title) {
         this.title = title;
+        saveFile();
+        terminate();
+        initialize();
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
         saveFile();
         terminate();
         initialize();

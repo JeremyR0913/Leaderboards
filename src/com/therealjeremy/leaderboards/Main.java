@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -51,6 +50,7 @@ public class Main extends JavaPlugin {
     private void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
         pm.registerEvents(new JoinQuitEvents(plugin), plugin);
+        pm.registerEvents(new ChunkEvents(plugin), plugin);
     }
 
     private StatManager statManager;
