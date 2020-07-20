@@ -6,10 +6,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class StatManager {
 
@@ -29,17 +33,17 @@ public class StatManager {
     /*
     Loads leaderboards from file.
      */
-    private void initializeLeaderboards(){
+    private void initializeLeaderboards() {
         File folder = new File(plugin.getDataFolder() + File.separator + "leaderboards");
-        if (!folder.exists()){
+        if (!folder.exists()) {
             Main.log("Generating 'leaderboards' folder...");
             folder.mkdirs();
         }
-        for (File file : folder.listFiles()){
-            if (file.getName().endsWith(".yml")){
+        for (File file : folder.listFiles()) {
+            if (file.getName().endsWith(".yml")) {
                 FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
                 String statIdentifier = fileConfig.getString("stat");
-                if (statIdentifier == null || getStat(statIdentifier) == null){
+                if (statIdentifier == null || getStat(statIdentifier) == null) {
                     Main.log("Could not register leaderboard '" + file.getName() + "'. Unknown stat: " + statIdentifier);
                     continue;
                 }
@@ -52,36 +56,74 @@ public class StatManager {
 
     private Map<String, Stat> statMap = new HashMap<>();
 
-    private void initializeStats(){
-        initializeStat(new StatMobsKilled(plugin));
-        initializeStat(new StatBlocksMined(plugin));
+    private void initializeStats() {
+        File folder = new File(plugin.getDataFolder() + File.separator + "statistics");
+        if (!folder.exists()) {
+            Main.log("Generating 'statistics' folder...");
+            folder.mkdirs();
+        }
+        JarLoader loader = new JarLoader(plugin);
+        for (File file : folder.listFiles(pathname -> pathname.getName().endsWith(".jar"))) {
+
+            Set<Class<?>> statClasses = null;
+            try {
+                statClasses = loader.myClassLoader(file);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            for (Class<?> statClass : statClasses) {
+                if (statClass == null) {
+                    continue;
+                }
+                Constructor constructor = null;
+                try {
+                    constructor = statClass.getConstructor(Main.class);
+                } catch (NoSuchMethodException ignored) {
+                }
+                Stat stat = null;
+                try {
+                    if (constructor != null) {
+                        stat = (Stat) constructor.newInstance(plugin);
+                    } else {
+                        stat = (Stat) statClass.newInstance();
+                    }
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    continue;
+                }
+                initializeStat(stat);
+            }
+
+        }
+        initializeStat(new StatMobsKilled());
         initializeStat(new StatTimePlayed(plugin));
-        initializeStat(new StatExpGained(plugin));
-        initializeStat(new StatAdvancementsFinished(plugin));
-        initializeStat(new StatTriggerRaid(plugin));
-        initializeStat(new StatRaidWaves(plugin));
-        initializeStat(new StatDamageDealt(plugin));
+        initializeStat(new StatExpGained());
+        initializeStat(new StatAdvancementsFinished());
+        initializeStat(new StatTriggerRaid());
+        initializeStat(new StatRaidWaves());
+        initializeStat(new StatDamageDealt());
+        initializeStat(new StatPlayersKilled());
+        initializeStat(new StatPlayerDeaths());
     }
 
-    private void initializeStat(Stat stat){
+    private void initializeStat(Stat stat) {
         try {
-            stat.initialize(plugin.getSqlConnection());
+            stat.initialize(plugin);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         statMap.put(stat.getIdentifier().toLowerCase(), stat);
     }
 
-    public void terminate(){
-        for (Stat stat : statMap.values()){
+    public void terminate() {
+        for (Stat stat : statMap.values()) {
             stat.terminate();
         }
-        for (Leaderboard leaderboard : leaderboardMap.values()){
+        for (Leaderboard leaderboard : leaderboardMap.values()) {
             leaderboard.terminate();
         }
     }
 
-    public void createLeaderboard(String identifier, Location location, Stat stat){
+    public void createLeaderboard(String identifier, Location location, Stat stat) {
         Leaderboard leaderboard = new Leaderboard(plugin, identifier, location, stat);
         leaderboard.initialize();
         leaderboardMap.put(leaderboard.getIdentifier().toLowerCase(), leaderboard);
@@ -91,11 +133,11 @@ public class StatManager {
         return statMap;
     }
 
-    public Stat getStat(String identifier){
+    public Stat getStat(String identifier) {
         return getStatMap().get(identifier.toLowerCase());
     }
 
-    public Collection<Stat> stats(){
+    public Collection<Stat> stats() {
         return getStatMap().values();
     }
 
@@ -103,11 +145,11 @@ public class StatManager {
         return leaderboardMap;
     }
 
-    public Leaderboard getLeaderboard(String identifier){
+    public Leaderboard getLeaderboard(String identifier) {
         return getLeaderboardMap().get(identifier.toLowerCase());
     }
 
-    public Collection<Leaderboard> leaderboards(){
+    public Collection<Leaderboard> leaderboards() {
         return getLeaderboardMap().values();
     }
 

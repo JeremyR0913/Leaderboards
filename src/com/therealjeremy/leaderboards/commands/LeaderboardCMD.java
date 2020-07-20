@@ -1,5 +1,8 @@
-package com.therealjeremy.leaderboards;
+package com.therealjeremy.leaderboards.commands;
 
+import com.therealjeremy.leaderboards.Leaderboard;
+import com.therealjeremy.leaderboards.Main;
+import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

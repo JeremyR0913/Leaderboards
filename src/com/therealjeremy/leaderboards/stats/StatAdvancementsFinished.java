@@ -1,14 +1,13 @@
 package com.therealjeremy.leaderboards.stats;
 
-import com.therealjeremy.leaderboards.Main;
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 
 public class StatAdvancementsFinished extends Stat {
 
-    public StatAdvancementsFinished(Main plugin) {
-        super(plugin);
+    public StatAdvancementsFinished() {
+        updateEntryAfterValue = 1;
     }
 
     @EventHandler

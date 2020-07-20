@@ -1,5 +1,9 @@
 package com.therealjeremy.leaderboards;
 
+import com.therealjeremy.leaderboards.commands.LeaderboardCMD;
+import com.therealjeremy.leaderboards.commands.SQLCMD;
+import com.therealjeremy.leaderboards.events.ChunkEvents;
+import com.therealjeremy.leaderboards.events.JoinQuitEvents;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -89,7 +93,7 @@ public class Main extends JavaPlugin {
     /*
     Utility method for executing statements to the SQL database.
      */
-    public void executeImmediately(String string) {
+    public static void executeImmediately(String string) {
         Statement statement = null;
         try {
             statement = getSqlConnection().createStatement();
@@ -160,6 +164,10 @@ public class Main extends JavaPlugin {
             return false;
         }
         return true;
+    }
+
+    public ClassLoader loader(){
+        return plugin.getClassLoader();
     }
 
 }

@@ -1,19 +1,12 @@
 package com.therealjeremy.leaderboards.stats;
 
-import com.therealjeremy.leaderboards.Main;
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 
 public class StatDamageDealt extends Stat {
-
-    public StatDamageDealt(Main plugin) {
-        super(plugin);
-    }
 
     @EventHandler
     public void dealDamage(EntityDamageByEntityEvent e) {

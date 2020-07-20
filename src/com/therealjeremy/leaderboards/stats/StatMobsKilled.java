@@ -1,6 +1,5 @@
 package com.therealjeremy.leaderboards.stats;
 
-import com.therealjeremy.leaderboards.Main;
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,8 +7,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 public class StatMobsKilled extends Stat {
 
-    public StatMobsKilled(Main plugin) {
-        super(plugin);
+    public StatMobsKilled() {
         updateEntryAfterValue = 1;
         updateEntryAfterSeconds = 1000000;
     }

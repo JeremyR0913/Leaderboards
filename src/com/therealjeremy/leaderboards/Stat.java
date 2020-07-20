@@ -27,14 +27,6 @@ public abstract class Stat implements Listener {
     // value
     // category
 
-    private Main plugin;
-
-    public Stat(Main plugin) {
-        this.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-
     /*
     Updates the database and removes the player from RAM storage when
     the player quits the server.
@@ -50,7 +42,6 @@ public abstract class Stat implements Listener {
         pendingValuesMap.remove(e.getPlayer());
     }
 
-    private Connection sqlConnection;
     private Map<Player, Map<String, Integer>> pendingValuesMap = new ConcurrentHashMap<>();
     private BukkitTask task;
     public int updateEntryAfterValue = 50;
@@ -60,9 +51,9 @@ public abstract class Stat implements Listener {
     Executed from StatManager.java.
     Initializes the stat, starts timer that updates database periodically.
      */
-    public void initialize(Connection sqlConnection) throws SQLException {
-        this.sqlConnection = sqlConnection;
-        Statement statement = sqlConnection.createStatement();
+    public void initialize(Main plugin) throws SQLException {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        Statement statement = Main.getSqlConnection().createStatement();
         statement.execute("create table if not exists " + getTableName() + "(time float(24), id varchar, value int, category varchar)");
         statement.close();
         task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
@@ -133,7 +124,7 @@ public abstract class Stat implements Listener {
             if (category != null){
                 query = "select id, sum(value) vsum from " + getTableName() + " where time > " + time + " and category = '" + category + "' group by id order by vsum desc limit " + size;
             }
-            statement = sqlConnection.createStatement();
+            statement = Main.getSqlConnection().createStatement();
             ResultSet set = statement.executeQuery(query);
             while (set.next()) {
                 list.add(new LeaderboardEntry(set.getString(1), set.getInt(2)));
@@ -160,7 +151,7 @@ public abstract class Stat implements Listener {
         int n = 0;
         Statement statement = null;
         try {
-            statement = sqlConnection.createStatement();
+            statement = Main.getSqlConnection().createStatement();
             ResultSet set = statement.executeQuery("select sum(value) from " + getTableName() + " where id='" + player.getUniqueId().toString() + "'");
             if (set.next()){
                 n = set.getInt(1);
@@ -210,7 +201,7 @@ public abstract class Stat implements Listener {
 //    }
 
     private void updateEntry(Player player, String category) {
-        plugin.executeImmediately("insert into " + getTableName() + " (id, value, time, category) values ('" + player.getUniqueId().toString() + "', " + pendingValuesMap.get(player).get(category) + ", " + System.currentTimeMillis() + ", '" + category + "')");
+        Main.executeImmediately("insert into " + getTableName() + " (id, value, time, category) values ('" + player.getUniqueId().toString() + "', " + pendingValuesMap.get(player).get(category) + ", " + System.currentTimeMillis() + ", '" + category + "')");
     }
 
 }

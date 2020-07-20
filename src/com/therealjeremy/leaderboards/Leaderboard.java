@@ -105,7 +105,7 @@ public class Leaderboard {
                 armorStandMap.get(0).setCustomName(Main.color(title));
                 int i = 1;
                 for (LeaderboardEntry lbe : stat.getLeaderboard(size, recentSeconds < 0 ? 0 : (System.currentTimeMillis() - (recentSeconds * 1000)), category)) {
-                    armorStandMap.get(i).setCustomName(Main.color(format.replace("{name}", Main.playerNameFromId(UUID.fromString(lbe.getId()))).replace("{value}", "" + stat.format(lbe.getValue()))));
+                    armorStandMap.get(i).setCustomName(Main.color(format.replace("{name}", plugin.playerNameFromId(UUID.fromString(lbe.getId()))).replace("{value}", "" + stat.format(lbe.getValue()))));
                     i++;
                 }
             }

@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class StatTimePlayed extends Stat {
     // Only use map to store data for players who joined within update span
 
     public StatTimePlayed(Main plugin) {
-        super(plugin);
         updateEntryAfterSeconds = 300;
         updateEntryAfterValue = 0;
         task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
@@ -51,8 +49,8 @@ public class StatTimePlayed extends Stat {
     }
 
     @Override
-    public void initialize(Connection sqlConnection) throws SQLException {
-        super.initialize(sqlConnection);
+    public void initialize(Main plugin) throws SQLException {
+        super.initialize(plugin);
         for (Player player : Bukkit.getOnlinePlayers()) {
             playerMap.put(player, System.currentTimeMillis());
             afkMap.put(player, new AFKInfo(player.getLocation().getPitch(), player.getLocation().getYaw()));

@@ -1,5 +1,7 @@
-package com.therealjeremy.leaderboards;
+package com.therealjeremy.leaderboards.events;
 
+import com.therealjeremy.leaderboards.Leaderboard;
+import com.therealjeremy.leaderboards.Main;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;

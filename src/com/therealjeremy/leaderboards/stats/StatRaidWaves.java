@@ -1,6 +1,5 @@
 package com.therealjeremy.leaderboards.stats;
 
-import com.therealjeremy.leaderboards.Main;
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,8 +9,8 @@ import org.bukkit.event.raid.RaidSpawnWaveEvent;
 
 public class StatRaidWaves extends Stat {
 
-    public StatRaidWaves(Main plugin) {
-        super(plugin);
+    public StatRaidWaves() {
+        updateEntryAfterValue = 1;
     }
 
     @EventHandler

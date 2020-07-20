@@ -1,5 +1,6 @@
-package com.therealjeremy.leaderboards;
+package com.therealjeremy.leaderboards.events;
 
+import com.therealjeremy.leaderboards.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
