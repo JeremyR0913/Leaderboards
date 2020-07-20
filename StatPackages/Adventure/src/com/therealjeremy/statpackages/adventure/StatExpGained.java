@@ -1,4 +1,4 @@
-package com.therealjeremy.leaderboards.stats;
+package com.therealjeremy.statpackages.adventure;
 
 import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.event.EventHandler;
