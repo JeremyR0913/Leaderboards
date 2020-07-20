@@ -1,6 +1,5 @@
 package com.therealjeremy.leaderboards;
 
-import com.therealjeremy.leaderboards.stats.*;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -94,15 +93,7 @@ public class StatManager {
             }
 
         }
-        initializeStat(new StatMobsKilled());
         initializeStat(new StatTimePlayed(plugin));
-        initializeStat(new StatExpGained());
-        initializeStat(new StatAdvancementsFinished());
-        initializeStat(new StatTriggerRaid());
-        initializeStat(new StatRaidWaves());
-        initializeStat(new StatDamageDealt());
-        initializeStat(new StatPlayersKilled());
-        initializeStat(new StatPlayerDeaths());
     }
 
     private void initializeStat(Stat stat) {

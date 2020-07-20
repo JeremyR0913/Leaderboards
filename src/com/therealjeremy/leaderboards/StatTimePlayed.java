@@ -1,7 +1,5 @@
-package com.therealjeremy.leaderboards.stats;
+package com.therealjeremy.leaderboards;
 
-import com.therealjeremy.leaderboards.Main;
-import com.therealjeremy.leaderboards.Stat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
